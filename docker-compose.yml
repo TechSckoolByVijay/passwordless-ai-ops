@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # Authentication Mode: Toggle between Managed Identity and Connection Strings
+      - USE_MANAGED_IDENTITY=${USE_MANAGED_IDENTITY:-true}
+      
+      # Azure Storage
+      - STORAGE_ACCOUNT_URL=${STORAGE_ACCOUNT_URL}
+      - STORAGE_CONNECTION_STRING=${STORAGE_CONNECTION_STRING}
+      
+      # Azure OpenAI
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_DEPLOYMENT_NAME=${AZURE_OPENAI_DEPLOYMENT_NAME}
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      
+      # Azure Identity (For Managed Identity mode)
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      
+      # Optional: For local development with Azure CLI
+      - AZURE_USERNAME=${AZURE_USERNAME}
+      - AZURE_PASSWORD=${AZURE_PASSWORD}
+    volumes:
+      # Mount for live code changes during development
+      - .:/app
+      # Azure CLI credentials (for local dev)
+      - ~/.azure:/root/.azure:ro
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

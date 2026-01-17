@@ -1,0 +1,16 @@
+# Web Server
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+
+# Identity & Azure (The Zero-Trust Core)
+azure-identity==1.19.0
+azure-storage-blob==12.24.0
+
+# LangChain & AI - Compatible versions
+langchain==0.3.19
+langchain-openai==0.3.2
+openai>=1.58.1
+
+# Utilities
+python-dotenv==1.0.1
+pydantic==2.9.0

@@ -1,0 +1,31 @@
+===========================================================
+EDUFLOW SYSTEMS: GLOBAL OPERATIONS & COMPLIANCE MANUAL 2026
+===========================================================
+
+1. PRODUCT ECOSYSTEM
+- Current Build: v4.2 "Summit" (Released Jan 2026).
+- Flagship Tool: "Sync-Grade" (AI-based auto-grading).
+- Experimental Tool: "Alpine-Voice" (In-beta, internal testing only).
+
+2. PRICING & TIERS
+- Basic: $300/yr. Max 50 students. Email support (24hr response).
+- Pro: $1,200/yr. Max 500 students. Includes Sync-Grade. Chat support (4hr response).
+- Enterprise: Custom price. Unlimited students. Includes HIPAA Security & Success Manager.
+
+3. DISCOUNTS & CONTRACTS
+- Non-profits: 15% discount. REQUIRES a 3-year "Legacy Contract."
+- Referral Bonus: $1,500 for employees if the new hire stays >90 days.
+
+4. DATA PRIVACY (THE "TRAPS")
+- Retention: Records are DELETED after 365 days of inactivity.
+- Deep-Archive: Keeps data for $50/month. 
+- Compliance: SOC2 and GDPR are for everyone. HIPAA is ONLY for Enterprise.
+
+5. TECHNICAL TROUBLESHOOTING (ERROR CODES)
+- Error 404-S: Sync-Grade sync failure. Solution: Refresh browser & check API key.
+- Error 505-L: Login overload. Solution: Ping #ops-emergency on Slack immediately.
+- Maintenance: Every Sunday 02:00 - 04:00 AM CST.
+
+6. COMPANY CULTURE
+- Focus Wednesdays: No meetings/calls allowed between 08:00 and 17:00 CST.
+- Learning Budget: $2,500/year per employee (Must be submitted by Nov 30).
