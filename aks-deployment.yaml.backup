@@ -5,7 +5,7 @@ metadata:
   namespace: default
   annotations:
     # This connects the K8s Service Account to the Azure Identity
-    azure.workload.identity/client-id: "8f9cae76-2daa-426b-88f5-6e062aee5896"
+    azure.workload.identity/client-id: "YOUR_MANAGED_IDENTITY_CLIENT_ID"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -26,16 +26,16 @@ spec:
       serviceAccountName: ai-agent-sa
       containers:
       - name: ai-agent
-        image: demoacr.azurecr.io/passwordless-ai-ops-app:v8
-        env:        
+        image: youracr.azurecr.io/passwordless-ai-ops-app:v2
+        env:
         - name: USE_MANAGED_IDENTITY
           value: "true"
         - name: STORAGE_ACCOUNT_URL
-          value: "https://chatwithdata01.blob.core.windows.net/"
+          value: "https://youraccount.blob.core.windows.net"
         - name: AZURE_OPENAI_ENDPOINT
-          value: "https://vijay-mkiemtgq-swedencentral.cognitiveservices.azure.com/"
+          value: "https://youropenai.openai.azure.com/"
         - name: AZURE_OPENAI_DEPLOYMENT_NAME
-          value: "gpt-5.2-chat"
+          value: "gpt-4"
         ports:
         - containerPort: 8000
 ---

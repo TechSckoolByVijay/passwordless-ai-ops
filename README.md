@@ -30,16 +30,8 @@ A FastAPI application demonstrating **passwordless authentication** with Azure s
 - Docker & Docker Compose
 - Azure Storage Account with a container named `docs` containing `knowledge.txt`
 - Azure OpenAI resource with a deployed model
-- Azure Container Registry (ACR)
+- Azure Container Registry (ACR) - optional for AKS deployment
 - Azure Kubernetes Service (AKS) - optional for deployment
-
-### Azure Container Registry Setup
-
-To enable AKS to pull images from ACR without passing secrets:
-
-```bash
-az aks update -g rg-sec-ops-agents -n aks-genai-agents --attach-acr demoacr
-```
 
 ### Push Docker Image to ACR
 
@@ -47,17 +39,7 @@ az aks update -g rg-sec-ops-agents -n aks-genai-agents --attach-acr demoacr
 # Build the Docker image
 docker build -t passwordless-ai-ops-app:v1 .
 
-# Login to ACR
-docker login demoacr.azurecr.io -u demoacr -p "YOUR_ACR_PASSWORD"
-
-# Tag the image
-docker tag passwordless-ai-ops-app:v1 demoacr.azurecr.io/passwordless-ai-ops-app:v1
-
-# Push to ACR
-docker push demoacr.azurecr.io/passwordless-ai-ops-app:v1
 ```
-
-> **Note**: Replace `demoacr` with your ACR name and use your actual ACR credentials.
 
 ## Quick Start
 
@@ -179,24 +161,127 @@ Ask a question based on the knowledge base stored in Azure Blob Storage.
 ### Using Azure Container Instances (ACI)
 
 ```bash
-# Build and push to ACR
-az acr build --registry <your-acr> --image passwordless-ai-ops:latest .
+# Build the Docker image
+docker build -t passwordless-ai-ops-app:latest .
+
+# Login to ACR
+az acr login --name <your-acr>
+
+# Tag the image for ACR
+docker tag passwordless-ai-ops-app:latest <your-acr>.azurecr.io/passwordless-ai-ops-app:latest
+
+# Push to ACR
+docker push <your-acr>.azurecr.io/passwordless-ai-ops-app:latest
 
 # Deploy to ACI with Managed Identity
 az container create \
   --resource-group <your-rg> \
   --name passwordless-ai-ops \
-  --image <your-acr>.azurecr.io/passwordless-ai-ops:latest \
+  --image <your-acr>.azurecr.io/passwordless-ai-ops-app:latest \
   --assign-identity \
   --environment-variables USE_MANAGED_IDENTITY=true \
   --ports 8000
 ```
 
+> **Note**: Replace `<your-acr>` and `<your-rg>` with your actual ACR name and resource group.
+
 ### Using Azure Kubernetes Service (AKS)
+
+#### Step 1: Attach ACR to AKS
+
+Enable AKS to pull images from ACR without passing secrets:
+
+```bash
+az aks update \
+    -g rg-sec-ops-agents \
+    -n aks-genai-agents \
+    --attach-acr demoacr
+```
+
+#### Step 2: Enable Workload Identity on Your Cluster
+
+If your AKS cluster is already created, you need to enable the OIDC issuer and Workload Identity features:
+
+```bash
+# Update your existing cluster to enable Workload Identity
+az aks update \
+    -g rg-sec-ops-agents \
+    -n aks-genai-agents \
+    --enable-oidc-issuer \
+    --enable-workload-identity
+```
+
+#### Step 3: Create the Managed Identity & Trust Bridge
+
+Create the Managed Identity and establish the trust relationship between Kubernetes and Azure:
+
+```bash
+# 1. Create the Managed Identity
+az identity create \
+    --name id-ai-agent-identity \
+    --resource-group rg-sec-ops-agents
+
+# 2. Get the OIDC Issuer URL (required for the trust handshake)
+export AKS_OIDC_ISSUER="$(az aks show -n aks-genai-agents -g rg-sec-ops-agents --query "oidcIssuerProfile.issuerUrl" -otsv)"
+
+# 3. Create the Federated Credential
+# This establishes trust: "Azure, trust the Service Account 'ai-agent-sa' in the 'default' namespace"
+az identity federated-credential create \
+    --name "fed-identity-ai-agent" \
+    --identity-name "id-ai-agent-identity" \
+    --resource-group rg-sec-ops-agents \
+    --issuer "${AKS_OIDC_ISSUER}" \
+    --subject "system:serviceaccount:default:ai-agent-sa"
+```
+
+#### Step 4: Grant Least Privilege Permissions
+
+Assign the managed identity the minimum required permissions to access Azure resources:
+
+```bash
+# Get the Client ID of your managed identity
+export USER_CLIENT_ID=$(az identity show -g rg-sec-ops-agents -n id-ai-agent-identity --query clientId -otsv)
+
+# Grant Storage Blob Data Reader role (for accessing knowledge.txt)
+az role assignment create \
+    --role "Storage Blob Data Reader" \
+    --assignee $USER_CLIENT_ID \
+    --scope /subscriptions/db8fcd00-4f68-42c3-8b19-947bf4d7b2c5/resourceGroups/chatwithdata/providers/Microsoft.Storage/storageAccounts/chatwithdata01
+
+# Grant Cognitive Services OpenAI User role (for Azure OpenAI access)
+az role assignment create \
+    --role "Cognitive Services OpenAI User" \
+    --assignee $USER_CLIENT_ID \
+    --scope /subscriptions/db8fcd00-4f68-42c3-8b19-947bf4d7b2c5/resourceGroups/rg-sec-ops-agents/providers/Microsoft.CognitiveServices/accounts/vijay-mkiemtgq-swedencentral
+```
+
+> **Note**: Replace the subscription ID, resource group names, and resource names with your actual Azure resources.
+
+#### Step 5: Deploy to AKS
 
 ```bash
 # Apply Kubernetes deployment
 kubectl apply -f aks-deployment.yaml
+
+# Verify the deployment
+kubectl get pods
+kubectl get service ai-agent-service
+
+# Check logs
+kubectl logs -l app=ai-agent
+
+# Restart deployment if needed (after RBAC changes)
+kubectl rollout restart deployment/ai-agent-deploy
+```
+
+#### Step 6: Test the Deployed Application
+
+```bash
+# Get the external IP of the service
+kubectl get service ai-agent-service
+
+# Test the API (replace <EXTERNAL-IP> with actual IP)
+curl "http://<EXTERNAL-IP>/ask?question=What is the pricing for Pro tier?"
 ```
 
 ## Security Best Practices
