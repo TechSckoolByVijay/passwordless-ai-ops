@@ -44,14 +44,17 @@ az aks update -g rg-sec-ops-agents -n aks-genai-agents --attach-acr demoacr
 ### Push Docker Image to ACR
 
 ```bash
+# Build the Docker image
+docker build -t passwordless-ai-ops-app:v1 .
+
 # Login to ACR
 docker login demoacr.azurecr.io -u demoacr -p "YOUR_ACR_PASSWORD"
 
 # Tag the image
-docker tag passwordless-ai-ops-app:latest demoacr.azurecr.io/passwordless-ai-ops-app:latest
+docker tag passwordless-ai-ops-app:v1 demoacr.azurecr.io/passwordless-ai-ops-app:v1
 
 # Push to ACR
-docker push demoacr.azurecr.io/passwordless-ai-ops-app:latest
+docker push demoacr.azurecr.io/passwordless-ai-ops-app:v1
 ```
 
 > **Note**: Replace `demoacr` with your ACR name and use your actual ACR credentials.
