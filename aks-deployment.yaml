@@ -26,14 +26,18 @@ spec:
       serviceAccountName: ai-agent-sa
       containers:
       - name: ai-agent
-        image: youracr.azurecr.io/ai-agent:v1
+        image: youracr.azurecr.io/passwordless-ai-ops-app:v2
         env:
+        - name: USE_MANAGED_IDENTITY
+          value: "true"
         - name: STORAGE_ACCOUNT_URL
           value: "https://youraccount.blob.core.windows.net"
         - name: AZURE_OPENAI_ENDPOINT
           value: "https://youropenai.openai.azure.com/"
-        - name: AZURE_OPENAI_MODEL_NAME
+        - name: AZURE_OPENAI_DEPLOYMENT_NAME
           value: "gpt-4"
+        ports:
+        - containerPort: 8000
 ---
 apiVersion: v1
 kind: Service
