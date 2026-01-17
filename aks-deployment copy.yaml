@@ -33,7 +33,7 @@ spec:
         - name: STORAGE_ACCOUNT_URL
           value: "https://chatwithdata01.blob.core.windows.net/"
         - name: AZURE_OPENAI_ENDPOINT
-          value: "https://myopenaivijay.openai.azure.com/"
+          value: "https://vijay-mkiemtgq-swedencentral.cognitiveservices.azure.com/"
         - name: AZURE_OPENAI_DEPLOYMENT_NAME
           value: "gpt-5.2-chat"
 ---

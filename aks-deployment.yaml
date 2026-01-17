@@ -26,14 +26,14 @@ spec:
       serviceAccountName: ai-agent-sa
       containers:
       - name: ai-agent
-        image: demoacr.azurecr.io/passwordless-ai-ops-app:v4
+        image: demoacr.azurecr.io/passwordless-ai-ops-app:v5
         env:        
         - name: USE_MANAGED_IDENTITY
           value: "true"
         - name: STORAGE_ACCOUNT_URL
           value: "https://chatwithdata01.blob.core.windows.net/"
         - name: AZURE_OPENAI_ENDPOINT
-          value: "https://myopenaivijay.openai.azure.com/"
+          value: "https://vijay-mkiemtgq-swedencentral.cognitiveservices.azure.com/"
         - name: AZURE_OPENAI_DEPLOYMENT_NAME
           value: "gpt-5.2-chat"
         ports:
