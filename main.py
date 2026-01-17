@@ -1,6 +1,6 @@
 import os
 from fastapi import FastAPI
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from azure.storage.blob import BlobServiceClient
 from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -34,12 +34,17 @@ async def ask_langchain(question: str):
     # 2. Initialize LangChain with Managed Identity or API Key
     if USE_MANAGED_IDENTITY:
         # Using Managed Identity (passwordless)
+        # Create a token provider function that returns tokens on-demand
+        token_provider = get_bearer_token_provider(
+            credential,
+            "https://cognitiveservices.azure.com/.default"
+        )
+        
         llm = AzureChatOpenAI(
             azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
             openai_api_version="2024-02-15-preview",
-            # This is the "Magic" - telling LangChain to use our Azure Identity
-            azure_ad_token_provider=credential.get_token("https://cognitiveservices.azure.com/.default").token
+            azure_ad_token_provider=token_provider
         )
         auth_method = "Managed Identity"
     else:
