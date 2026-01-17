@@ -30,6 +30,31 @@ A FastAPI application demonstrating **passwordless authentication** with Azure s
 - Docker & Docker Compose
 - Azure Storage Account with a container named `docs` containing `knowledge.txt`
 - Azure OpenAI resource with a deployed model
+- Azure Container Registry (ACR)
+- Azure Kubernetes Service (AKS) - optional for deployment
+
+### Azure Container Registry Setup
+
+To enable AKS to pull images from ACR without passing secrets:
+
+```bash
+az aks update -g rg-sec-ops-agents -n aks-genai-agents --attach-acr demoacr
+```
+
+### Push Docker Image to ACR
+
+```bash
+# Login to ACR
+docker login demoacr.azurecr.io -u demoacr -p "YOUR_ACR_PASSWORD"
+
+# Tag the image
+docker tag passwordless-ai-ops-app:latest demoacr.azurecr.io/passwordless-ai-ops-app:latest
+
+# Push to ACR
+docker push demoacr.azurecr.io/passwordless-ai-ops-app:latest
+```
+
+> **Note**: Replace `demoacr` with your ACR name and use your actual ACR credentials.
 
 ## Quick Start
 
