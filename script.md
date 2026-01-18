@@ -109,8 +109,8 @@ Before we even talk about application identities, let's secure how our cluster p
 
 ```bash
 az aks update \
-    -g rg-sec-ops-agents \
-    -n aks-genai-agents \
+    --resource-group rg-sec-ops-agents \
+    --name aks-genai-agents \
     --attach-acr demoacr
 ```
 
