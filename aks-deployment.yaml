@@ -31,7 +31,7 @@ spec:
         - name: USE_MANAGED_IDENTITY
           value: "true"
         - name: STORAGE_ACCOUNT_URL
-          value: "https://chatwithdata01.blob.core.windows.net/"
+          value: "https://mygenaiusecases.blob.core.windows.net/"
         - name: AZURE_OPENAI_ENDPOINT
           value: "https://vijay-mkiemtgq-swedencentral.cognitiveservices.azure.com/"
         - name: AZURE_OPENAI_DEPLOYMENT_NAME

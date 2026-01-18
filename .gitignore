@@ -1,5 +1,6 @@
 # Environment variables
 .env
+script.md
 
 # Python
 __pycache__/
